@@ -1,6 +1,13 @@
 package com.sneg.utils;
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -9,37 +16,45 @@ import java.util.Set;
  * Time:	22:53
  */
 public class Graph {
-	private Set <Node> _nodes = new HashSet<>();
-	private Set <Edge> _edges = new HashSet<>();
+	private Map <String, Node> _nodes = new HashMap<>();
+	private Map <String, Edge> _edges = new HashMap<>();
 
 	public Set <Node> getNodes() {
-		return _nodes;
+		return new HashSet<> (_nodes.values());
 	}
 
-	public void setNodes (Set <Node> nodes) {
-		_nodes = nodes;
+	public Node getNode (String id) {
+		return _nodes.get (id);
 	}
 
 	public void addNode (Node node) {
-		_nodes.add (node);
+		_nodes.put (node.getId(), node);
+	}
+
+	public boolean removeNode (String id) {
+		return _nodes.remove (id) != null;
 	}
 
 	public Set <Edge> getEdges() {
-		return _edges;
+		return new HashSet<> (_edges.values());
 	}
 
-	public void setEdges (Set <Edge> edges) {
-		this._edges = edges;
+	public Edge getEdge (String id) {
+		return _edges.get (id);
 	}
 
 	public void addEdge (Edge edge) {
-		_edges.add (edge);
+		_edges.put (edge.getId(), edge);
+	}
+
+	public boolean removeEdge (String id) {
+		return _edges.remove (id) != null;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder().append ("Graph {\n");
 
-		for (Node node : _nodes) {
+		for (Node node : _nodes.values ()) {
 			sb.append ("\t").append (node.getId()).append (": ");
 
 			for (Edge edge : node.getEdges()) {
@@ -77,6 +92,10 @@ public class Graph {
 			_edges.add (edge);
 		}
 
+		public boolean removeEdge (Edge edge) {
+			return _edges.remove (edge);
+		}
+
 		public boolean equals (Object o) {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
@@ -111,6 +130,34 @@ public class Graph {
 
 		public Node[] getNodes() {
 			return new Node[] {_node1, _node2};
+		}
+
+		public boolean isSelfEdge() {
+			return _node1.equals (_node2);
+		}
+
+		public void replace (Node orgNode, Node newNode) {
+			if (orgNode.equals (_node1)) {
+				_node1 = newNode;
+			}
+			else if (orgNode.equals (_node2)) {
+				_node2 = newNode;
+			}
+			else {
+				throw new IllegalStateException ("None of the nodes is " + orgNode);
+			}
+		}
+
+		public Node getOtherEnd (Node node) {
+			if (node.equals (_node1)) {
+				return _node2;
+			}
+			else if (node.equals (_node2)) {
+				return _node1;
+			}
+			else {
+				throw new IllegalStateException ("None of the nodes is " + node);
+			}
 		}
 
 		public boolean equals (Object o) {
