@@ -33,7 +33,7 @@ public class Scc {
 		if (args.length == 0) throw new IllegalArgumentException ("No input file");
 		String input = args[0];
 
-//		String input = "D:/Courses/Algorithms-Design/Home/Week-4/SCC.txt";
+//		String input = "D:/Courses/Algorithms-Design/Home/Week-4/SCC.txt";		// [434821, 968, 459, 313, 211]
 //		String input = "D:/Courses/Algorithms-Design/Home/Week-4/test-1.txt";	// [3, 3, 2]
 //		String input = "D:/Courses/Algorithms-Design/Home/Week-4/test-2.txt";	// [6, 3, 2, 1]
 //		String input = "D:/Courses/Algorithms-Design/Home/Week-4/test-3.txt";	// [3, 3, 1, 1]
@@ -152,6 +152,6 @@ public class Scc {
 		List <Integer> sizes = new ArrayList<> (sccs.values());
 		Collections.sort (sizes);
 		Collections.reverse (sizes);
-		System.out.println (sizes);
+		System.out.println (sizes.size() > 5 ? sizes.subList (0, 5) : sizes);
 	}
 }

@@ -22,7 +22,10 @@ public class GraphBuilder {
 
 		Graph graph = new Graph();
 
+		int i = 0;
 		for (String line : lines) {
+			if (++i % 10000 == 0) System.out.print ("\r" + (i / 10000));
+
 			Matcher matcher = PATTERN.matcher (line);
 			if (!matcher.matches()) throw new IllegalStateException ("Wrong input " + line);
 
@@ -45,6 +48,8 @@ public class GraphBuilder {
 			Graph.Edge edge = new Graph.Edge (tail, head);
 			tail.addEdge (edge);
 		}
+
+		System.out.print ('\n');
 
 		return graph;
 	}
