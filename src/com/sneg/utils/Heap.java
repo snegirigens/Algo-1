@@ -1,21 +1,26 @@
 package com.sneg.utils;
 
-import com.sun.deploy.util.StringUtils;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * Author:	sneg
  * Date:	07.06.14
  * Time:	10:39
  */
-public class Heap <T extends Comparable <T>> {
+public class Heap <T> {
 	private final List <T> _heap = new ArrayList<>();
+	private final Comparator <T> _comparator;
 	private int size = 0;
+
+	public Heap() {
+		this (null);
+	}
+
+	public Heap (Comparator <T> comparator) {
+		_comparator = comparator;
+	}
 
 	public void add (T element) {
 		_heap.add (element);
@@ -35,6 +40,10 @@ public class Heap <T extends Comparable <T>> {
 		return root;
 	}
 
+	public int size() {
+		return size;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -47,7 +56,7 @@ public class Heap <T extends Comparable <T>> {
 
 	private void bubbleUp (int i) {
 		if (i <= 0) return;
-		if (_heap.get (i/2).compareTo (_heap.get (i)) > 0) {
+		if (compare (i/2, i) > 0) {
 			swap (i/2, i);
 			bubbleUp (i/2);
 		}
@@ -57,32 +66,32 @@ public class Heap <T extends Comparable <T>> {
 		if (size - ((i + 1) * 2) > 0) {			// 2 children
 			int left  = (i + 1) * 2 - 1;
 			int right = (i + 1) * 2;
-			int child = (_heap.get (left).compareTo (_heap.get (right)) < 0) ? left : right;
-			if (_heap.get (i).compareTo (_heap.get (child)) > 0) {
+			int child = (compare (left, right) < 0) ? left : right;
+			if (compare (i, child) > 0) {
 				swap (i, child);
 				bubbleDown (child);
 			}
 		}
 		else if (size - ((i + 1) * 2) == 0) {	// 1 child
 			int left = (i + 1) * 2 - 1;
-			if (_heap.get (i).compareTo (_heap.get (left)) > 0) {
+			if (compare (i, left) > 0) {
 				swap (i, left);
 				bubbleDown (left);
 			}
 		}
 	}
 
+	@SuppressWarnings ("unchecked")
+	private int compare (int i, int j) {
+		if (_comparator != null) {
+			return _comparator.compare (_heap.get (i), _heap.get (j));
+		}
+		else {
+			return ((Comparable <T>) _heap.get (i)).compareTo (_heap.get (j));
+		}
+	}
+
 	private void swap (int i, int j) {
 		_heap.set (j, _heap.set (i, _heap.get (j)));
 	}
-//
-//	private boolean hasLeft (int i) {
-//		int index = (i + 1) * 2;
-//		return index <= size;
-//	}
-//
-//	private boolean hasRight (int i) {
-//		int index = (i + 1) * 2;
-//		return index <= size + 1;
-//	}
 }

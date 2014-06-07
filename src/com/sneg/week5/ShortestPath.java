@@ -1,16 +1,10 @@
 package com.sneg.week5;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.sneg.utils.Heap;
+
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Author:	sneg
@@ -19,7 +13,7 @@ import java.util.TreeSet;
  */
 public class ShortestPath {
 	public static void main (String[] args) throws Exception {
-		String input = "D:/Courses/Algorithms-Design/Home/Week-5/dijkstraData.txt";
+		String input = "D:/Courses/Algorithms-Design/Home/Week-5/dijkstraData.txt";	// 2599,2610,2947,2052,2367,2399,2029,2442,2505,3068
 //		String input = "D:/Courses/Algorithms-Design/Home/Week-5/test-1.txt";
 //		String input = "D:/Courses/Algorithms-Design/Home/Week-5/test-2.txt";
 
@@ -28,14 +22,16 @@ public class ShortestPath {
 		System.out.println (graph);
 
 		ShortestPath sp = new ShortestPath (graph);
+		long start = System.currentTimeMillis();
 		sp.processGraph ("1");
+		long end = System.currentTimeMillis();
 
-		System.out.println ("------------------");
+//		System.out.println ("------------------");
 //		System.out.println (graph);
-
-		for (Graph.Node node : graph.getNodes()) {
-			System.out.println (node.getId() + " --> " + node.getScore());
-		}
+//
+//		for (Graph.Node node : graph.getNodes()) {
+//			System.out.println (node.getId() + " --> " + node.getScore());
+//		}
 
 		String[] targetIds = new String[] { "7","37","59","82","99","115","133","165","188","197" };
 
@@ -50,13 +46,17 @@ public class ShortestPath {
 		}
 
 		System.out.println (sb);
+		System.out.println ("Processing time: " + (end - start) + " ms.");
 	}
 
 	private final Graph _graph;
 	private final Map <String, Graph.Node> _explored = new HashMap<>();
 
-	private final Set <Graph.Edge> _crossEdges = new HashSet<>();
-	private final Set <Graph.Node> _candidateNodes = new HashSet<>();
+	private final Heap <Graph.Node> _candidateNodes = new Heap<> (new Comparator <Graph.Node>() {
+		public int compare (Graph.Node node1, Graph.Node node2) {
+			return node1.getScore() - node2.getScore();
+		}
+	});
 
 	public ShortestPath (Graph graph) {
 		_graph = graph;
@@ -71,39 +71,30 @@ public class ShortestPath {
 	}
 
 	private void loop (Graph.Node node) {
-		Comparator <Graph.Node> nodeComparator = new Comparator <Graph.Node>() {
-			public int compare (Graph.Node node1, Graph.Node node2) {
-				return node1.getScore() - node2.getScore();
-			}
-		};
-
-		while (_explored.size() < _graph.getNodes().size()) {
+//		while (_explored.size() < _graph.getNodes().size() || _candidateNodes.size() > 0) {
+		while (true) {
 			processNode (node);
 
 			if (_candidateNodes.size() > 0) {
-				List <Graph.Node> nodes = new ArrayList<> (_candidateNodes);
-				Collections.sort (nodes, nodeComparator);
-
-				node = nodes.get (0);
+				node = _candidateNodes.remove();
+			} else {
+				break;
 			}
 		}
 	}
 
 	private void processNode (Graph.Node node) {
+		if (_explored.containsKey (node.getId())) return;
+
 		_explored.put (node.getId(), node);
-		_candidateNodes.remove (node);
 
 		for (Graph.Edge edge : node.getEdges()) {
 			Graph.Node other = edge.getOtherEnd (node);
 
-			if (_explored.containsKey (other.getId())) {
-				_crossEdges.remove (edge);
-			}
-			else {
+			if (!_explored.containsKey (other.getId())) {
 				int provisionalScore = node.getScore() + edge.getLength();
-				other.setScore (Math.min (other.getScore(), provisionalScore));
+				other.setScore (Math.min (other.getScore (), provisionalScore));
 
-				_crossEdges.add (edge);
 				_candidateNodes.add (other);
 			}
 		}
