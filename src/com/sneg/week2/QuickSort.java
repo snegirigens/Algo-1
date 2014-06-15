@@ -14,6 +14,10 @@ import java.util.List;
  * Time:	22:25
  */
 public class QuickSort {
+	public static void sort (int[] array) {
+		sort (array, 0, array.length - 1, new MedianElementPivot());
+	}
+
 	private static long _comparisons = 0;
 
 	public static void main (String[] args) throws Exception {
