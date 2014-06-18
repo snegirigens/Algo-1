@@ -56,9 +56,10 @@ public class Heap <T> {
 
 	private void bubbleUp (int i) {
 		if (i <= 0) return;
-		if (compare (i/2, i) > 0) {
-			swap (i/2, i);
-			bubbleUp (i/2);
+		int parent = (i - 1) / 2;
+		if (compare (parent, i) > 0) {
+			swap (parent, i);
+			bubbleUp (parent);
 		}
 	}
 
